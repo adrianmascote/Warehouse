@@ -30,22 +30,32 @@
 * Customer Order
 * Bill of Lading 
 
-## Initial Data Model 
-* **CustomerOrder** (Referenced for 'order_id', 'order_date', 'status')
-* **BillOfLading** (Referenced for 'order_id' , 'shipped_date')
+### CustomerOrder (Referenced)
 
-## Gherkin AC 
+| Field Name | Data Type | Description | 
+|---|---|---|
+| 'order_id' | Integer | Primary key for the customer order | 
+| 'order_date' | Date | The date the order was created | 
+| 'status' | String | The current order status | 
 
-### US-11.1 
-**Scenario: Manager checks average fulfillment speed** 
-**Given** the manager is on the reporting screen 
-**When** the manager clicks "Generate Speed Report" 
-**Then** the system should display the average time taken to ship an order 
+### BillOfLading (Referenced)
 
-### US-11.2 
-**Scenario: Manager views shipping brackets** 
-**Given** the speed report is generated
-**When** the manager selects "View Brackets" 
-**Then** the system should group the orders to show what eprcentage shipped in under 24, 48, and over 72 hours. 
+| Field Name | Data Type | Description | 
+|---|---|---|
+| 'order_id' | Integer | Foreign key referencing the associated CustomerOrder |
+| 'shipped_date' | Date | The date the order was shipped | 
 
+'''## Gherkin AC 
 
+    ### US-11.1 
+    **Scenario: Manager checks average fulfillment speed** 
+    **Given** the manager is on the reporting screen 
+    **When** the manager clicks "Generate Speed Report" 
+    **Then** the system should display the average time taken to ship an order 
+
+    ### US-11.2 
+    **Scenario: Manager views shipping brackets** 
+    **Given** the speed report is generated
+    **When** the manager selects "View Brackets" 
+    **Then** the system should group the orders to show what eprcentage shipped in under 24, 48, and over 72 hours. 
+'''

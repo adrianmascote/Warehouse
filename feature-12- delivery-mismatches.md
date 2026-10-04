@@ -28,20 +28,31 @@
 * Bill of Lading 
 
 ## Initial Data Model 
-* **CustomerOrder** (Referenced for original items quantities requested)
-* **BillOfLading** (Referenced for actual shipped and delivered amounts)
 
-## Gherkin AC 
+### CustomerOrder (Referenced)
 
-### US-12.1 
-**Scenario: Manager views incomplete shipments** 
-**Given** the manager is on the reporting screen
-**When** the manager clicks "Generate Delivery Mismatch Report" 
-**Then** the system should display a list of customer orders where the warehouse shipped either fewer or more items than requested. 
+| Field Name | Data Type | Description | 
+|---|---|---| 
+| 'qty_requested' | Integer | The original item quantities requested by the customer | 
 
-### US-12.2 
-**Scenario: Manager investigates route losses** 
-**Given** the Delivery Mismatch Report is generated
-**When** the manager filters by "Driver Issues" 
-**Then** the system should display orders where the customer received fewer items than what was loaded on the truck. 
+### BillOfLading (Referenced)
 
+| Field Name | Data Type | Description |
+|---|---|---|
+| 'qty_shipped' | Integer | The amount of times actually loaded and shipped |
+| 'qty_delivered' | Integer | The final amount of items signed for and delivered | 
+
+'''## Gherkin AC 
+
+    ### US-12.1 
+    Scenario: Manager views incomplete shipments 
+    Given: the manager is on the reporting screen
+    When: the manager clicks "Generate Delivery Mismatch Report" 
+    Then: the system should display a list of customer orders where the warehouse shipped either fewer or more items than requested. 
+
+    ### US-12.2 
+    Scenario: Manager investigates route losses** 
+    Given: the Delivery Mismatch Report is generated
+    When: the manager filters by "Driver Issues" 
+    Then: the system should display orders where the customer received fewer items than what was loaded on the truck. 
+'''

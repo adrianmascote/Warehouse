@@ -32,43 +32,47 @@
 ## Functional Requirements 
 * The system must allow authorized users to add items to the catalog. 
 * The system must allow users to update item names and descriptions. 
-The system must allow users to delete an item from the catalog entirely. 
+* The system must allow users to delete an item from the catalog entirely. 
 
 ## Key Entities 
 * Item 
 * Manager 
 
 ## Initial Data Model 
-* **Item** 
-* 'item_id' (Primary Key)
-* 'sku' (String)
-* 'item_upc' (String)
-* 'case_upc' (String)
-* 'description' (String)
-* 'case_cost' (Decimal)
-* 'price' (Decimal)
 
-## Gherkin AC 
+### Item 
 
-### US-4.1 
-**Scenario: Manager adds a new item** 
-**Given** the manager is on the Items management screen 
-**When** the manager enters a new item name and barcode number
-**And** clicks "Save" 
-**Then** the system mshould create a new item in the database. 
+| Field Name | Data Type | Description |
+|---|---|---|
+| `item_id` | Integer | Primary key for the item | 
+| `sku` | String | The SKU identifier for the item | 
+| `item_upc` | String | The UPC barcode for the individual item | 
+| `case_upc` | String | The UPC barcode for a case of the item | 
+| `description` | String | The description of the item | 
+| `case_cost` | Decimal | The cost per case | 
+| `price` | Decimal | The selling price of the item |
 
-### US-4.2 
-**Scenario: Manager updates an item** 
-**Given** an item already exists in the system
-**When** the manager changes the item's description
-**And** clicks "Update" 
-**Then** the system should save the new description of that item. 
+'''## Gherkin AC 
 
-### US-4.3 
-**Scenario: Manager deletes an item** 
-**Given** an item exists in the system 
-**When** the manager clicks "Delete" on the item's profile 
-**Then** the system should remove the item completely from the database. 
+    ### US-4.1 
+    Scenario: Manager adds a new item 
+    Given: the manager is on the Items management screen 
+    When: the manager enters a new item name and barcode number
+    And: clicks "Save" 
+    Then: the system mshould create a new item in the database. 
 
+    ### US-4.2 
+    Scenario: Manager updates an item 
+    Given: an item already exists in the system
+    When: the manager changes the item's description
+    And: clicks "Update" 
+    Then: the system should save the new description of that item. 
+
+    ### US-4.3 
+    Scenario: Manager deletes an item 
+    Given: an item exists in the system 
+    When the manager clicks "Delete" on the item's profile 
+    Then the system should remove the item completely from the database. 
+'''
 
 

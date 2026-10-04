@@ -39,30 +39,35 @@
 * Manager 
 
 ## Initial Data Model 
-* **Route** 
-* 'route_id' (Primary Key)
-* 'route_name' (String)
-* 'geographic_area' (String)
 
-## Gherkin AC 
+### Route 
 
-### US-6.1 
-**Scenario: Manager adds a new route** 
-**Given** a manager is on the Routes managements screen
-**When** the manager enters a route name like "Northside" and an area
-**And** clicks "Save"
-**Then** the system should create a new route profile 
-**And** the route should appear in the active routes list. 
+| Field Name | Data Type | Description | 
+|---|---|---| 
+| `route_id` | Integer | Primary key for the route | 
+| `route_name` | String | The name of the route |
+| `geographic_area` | String | The geographic area covered by a route |
 
-### US-6.2 
-**Scenario: Manager updates a route** 
-**Given** a route profile already exists in the system 
-**When** the manager changes the geographic area details 
-**And** clicks "Update" 
-**Then** the system should save the new area for that route 
+'''## Gherkin AC 
 
-### US-6.3
-**Scenario: Manager deletes a route** 
-**Given** a route profile already exists in the system
-**When** the manager clicks "Delete" on the route 
-**Then** the system should remove the route from the active list 
+    ### US-6.1 
+    Scenario: Manager adds a new route 
+    Given: a manager is on the Routes managements screen
+    When: the manager enters a route name like "Northside" and an area
+    And: clicks "Save"
+    Then: the system should create a new route profile 
+    And: the route should appear in the active routes list. 
+
+    ### US-6.2 
+    Scenario: Manager updates a route 
+    Given: a route profile already exists in the system 
+    When: the manager changes the geographic area details 
+    And: clicks "Update" 
+    Then: the system should save the new area for that route 
+
+    ### US-6.3
+    Scenario: Manager deletes a route
+    Given: a route profile already exists in the system
+    When: the manager clicks "Delete" on the route 
+    Then: the system should remove the route from the active list 
+'''

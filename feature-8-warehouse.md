@@ -40,29 +40,35 @@
 * Manager 
 
 ## Initial Data Model 
-* **StorageZone** 
-* 'zone_id' (Primary Key)
-* 'zone_name' (String - "Ailse 4, "BinB")
-* 'zone_type' (String - e.g., "Standard", "Refrigerated")
 
-## Gherkin AC 
+### StorageZone 
 
-### US-8.1 
-**Scenario: Manager adds a new storage zone** 
-**Given** a manager is on the Zone management screen
-**When** the manager enters a new zone name like "Ailse 7" 
-**And** clicks "Save" 
-**Then** the system should create a new storage zone in the database. 
+| Field Name | Data Type | Description | 
+|---|---|---| 
+| `zone_id` | Integer | Primary key for the storage zone | 
+| `zone_name` | String | The name of the zone (e.g., Ailse 4, Bin B) | 
+| `zone_type` | String | The type of storage zone (e.g., Standard, Refrigerated) |
 
-### US-8.2 
-**Scenario: Manager updates a storage zone** 
-**Given** a storage zone profile already exists 
-**When** the manager updates the zone type to "Refrigerated" 
-**And** clicks "Update" 
-**Then** the system should save the enw type for that zone 
 
-### US-8.3 
-**Scenario: Maager deletes a storage zone** 
-**Given** a storage zone exists in the system 
-**When** the manager clicks "Delete" on the zone record 
-**Then** the system should remove the zone from the active database. 
+'''## Gherkin AC 
+
+    ### US-8.1 
+    Scenario: Manager adds a new storage zone
+    Given: a manager is on the Zone management screen
+    When: the manager enters a new zone name like "Ailse 7" 
+    And: clicks "Save" 
+    Then: the system should create a new storage zone in the database. 
+
+    ### US-8.2 
+    Scenario: Manager updates a storage zone 
+    Given: a storage zone profile already exists 
+    When: the manager updates the zone type to "Refrigerated" 
+    And: clicks "Update" 
+    Then: the system should save the enw type for that zone 
+
+    ### US-8.3 
+    Scenario: Maager deletes a storage zone 
+    Given: a storage zone exists in the system 
+    When: the manager clicks "Delete" on the zone record 
+    Then: the system should remove the zone from the active database. 
+'''

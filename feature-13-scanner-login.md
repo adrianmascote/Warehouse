@@ -42,33 +42,43 @@
 * Session
 
 ## Initial Data Model 
-* **WorkerAuth** 
-* 'worker_id' (Foreign Key linked to Worker)
-* 'password_hash' (String)
-* 'role' (String - e.g., "Standard", "Manager")
-* **DeviceSession** 
-* 'session_id' (Primary Key)
-* 'worker_id' (Foreign Key)
-* 'login_time' (DateTime)
 
-## Gherkin AC 
+### WorkerAuthorization 
 
-### US-13.1 
-**Scenario: Worker successfully logs into scanner** 
-**Given** the worker is on the scanner login screen
-**When** the worker enters a valid Worker ID and Password
-**And** clicks "Login" 
-**Then** the system should grant access and display the task menu. 
+| Field Name | Data Type | Description | 
+|---|---|---|
+| 'worker_id' | Integer | Foreign key referencing the worker | 
+| 'password_hash' | String | The securely hashed password | 
+| 'role' | String | The system access level (e.g., Sandard, Manager) |
 
-### US-13.2 
-**Scenario: Worker attempts to access restricted area** 
-**Given** a user with a "Standard" role is logged in
-**When** the user attempts to open the Manager reporting screen 
-**Then** the system should display an "Access Denied" Error message
+### DeciveSession 
+
+| Field Name | Data Type | Description |
+|---|---|---|
+| 'session_id' | Integer | Primary key for the device session | 
+| 'worker_id' | Integer | Foreign key referencing teh Worker logged in | 
+| 'login_time' | DateTime | The exact date and time the session started | 
 
 
-### US-13.3 
-**Scenario: Worker logs out at end of shift** 
-**Given** a worker is logged into an active scanner session
-**When** the worker clicks "Log Out" 
-**Then** the system should end the session and return to the main login screen. 
+'''## Gherkin AC 
+
+    ### US-13.1 
+    Scenario: Worker successfully logs into scanner 
+    Given the worker is on the scanner login screen
+    When the worker enters a valid Worker ID and Password
+    And clicks "Login" 
+    Then the system should grant access and display the task menu. 
+
+    ### US-13.2 
+    Scenario: Worker attempts to access restricted area** 
+    Given a user with a "Standard" role is logged in
+    When the user attempts to open the Manager reporting screen 
+    Then the system should display an "Access Denied" Error message
+
+
+    ### US-13.3 
+    Scenario: Worker logs out at end of shift** 
+    Given a worker is logged into an active scanner session
+    When the worker clicks "Log Out" 
+    Then the system should end the session and return to the main login screen. 
+'''

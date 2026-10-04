@@ -39,34 +39,39 @@
 * manager 
 
 ## Initial Data Model 
-* **Worker** 
-* 'worker_id' (Primary Key)
-* 'full_name' (String)
-* 'job_role' (String - Picker, Receiver, Driver)
-* 'status' (String - Active, Inactive)
 
-## Gherkin AC 
-### US-5.1 
-**Scenario: Manager adds a new worker**
-**Given** a manager is on the Workers management screen 
-**When** the manager enters a new worker's name and job role
-**And** clicks "Save" 
-**Then** the system should create a new worker profile 
-**And** the worker should be saved and appear in the active roster. 
+### Worker 
 
-### US-5.2 
-**Scenario: Manager updates a worker role** 
-**Given** a worker profile exists in the system 
-**When** the manager changes the worker's role from "Picker" to "Receiver" 
-**And** clicks "Update" 
-**Then** the system should save the new role for that worker
+| Field Name | Data Type | Description | 
+|---|---|---|
+| `worder_id` | Integer | Primary key for the worker |
+| `full_name` | String | The full name of the worker | 
+| `job_role` | String | The worker's role (e.g., Picker, Receiver, Driver) |
+| `status` | Boolean | True if the worker is employed, False if otherwise (e.g., Active, Inactive) |
 
-### US-5.3
-**Scenario: Manager deactivates a worker**
-**Given** a worker profile exists in the system 
-**When** the manager clicks "Deactivate" on the worker profile 
-**Then** the system should change the worker's status to "Inactive" 
-**And** the worker should be removed from the active roster 
+'''## Gherkin AC 
+    ### US-5.1 
+    Scenario: Manager adds a new worker
+    Given: a manager is on the Workers management screen 
+    When: the manager enters a new worker's name and job role
+    And: clicks "Save" 
+    Then: the system should create a new worker profile 
+    And: the worker should be saved and appear in the active roster. 
+
+    ### US-5.2 
+    Scenario: Manager updates a worker role 
+    Given: a worker profile exists in the system 
+    When: the manager changes the worker's role from "Picker" to "Receiver" 
+    And: clicks "Update" 
+    Then: the system should save the new role for that worker
+
+    ### US-5.3
+    Scenario: Manager deactivates a worker
+    Given: a worker profile exists in the system 
+    When: the manager clicks "Deactivate" on the worker profile 
+    Then: the system should change the worker's status to "Inactive" 
+    And: the worker should be removed from the active roster 
+'''
 
 
 

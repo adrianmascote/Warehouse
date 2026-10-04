@@ -32,22 +32,46 @@
 * Item 
 
 ## Initial Data Model 
-* **SupplierOrder** (Referenced for 'po_number', 'supplier_id', 'status')
-* **SupplierOrderItem** (Referenced for 'sku', expected 'cases')
-* **Supplier** (Referenced for 'name')
-* **Item** (Referenced for 'description')
 
-## Gherkin AC 
+### SupplierOrder (Referenced)
 
-### US-10.1 
-**Scenario: Manager views orders with missing items** 
-**Given** the manager is on the reporting screen
-**When** the manager clicks "Generate Supplier Discrepancy Report" 
-**Then** the system should display a list of all recent Purchase Orders where the received case count was lower than the ordered case count
+| Field Name | Data Type | Description | 
+|---|---|---|
+| `po_number` | String | The purchase order number | 
+| `supplier_id` | Integer | Foreign key referencing the supplier | 
+| `status` | String | The order status | 
 
-### US-10.2 
-**Scenario: Manager investigates a specific supplier issue** 
-**Given** the supplier Discrepancy Report is generated 
-**when** the manager clicks on a specific flagged PO number 
-**Then** the system should display the Item SKUs that were missing and the difference in case amounts. 
+### SupplierOrderItem (Referenced)
 
+| Field Name | Data Type | Description | 
+|---|---|---|
+| `sku` | String | The SKU identifier for the item ordered | 
+| `cases` | Integer | The number of cases ordered | 
+| `cases_received` | Integer | The number of cases received at the dock |
+
+### Supplier (Referenced)
+
+| Field Name | Data Type | Description | 
+|---|---|---|
+| 'name' | String | The name of the supplier | 
+
+### Item (Referenced)
+
+| Field Name | Data Type | Description | 
+|---|---|---|
+| 'description' | String | The description of the item |
+
+'''## Gherkin AC 
+
+    ### US-10.1 
+    Scenario: Manager views orders with missing items 
+    Given: the manager is on the reporting screen
+    When: the manager clicks "Generate Supplier Discrepancy Report" 
+    Then: the system should display a list of all recent Purchase Orders where the received case count was lower than the ordered case count
+
+    ### US-10.2 
+    Scenario: Manager investigates a specific supplier issue 
+    Given: the supplier Discrepancy Report is generated 
+    When: the manager clicks on a specific flagged PO number 
+    Then: the system should display the Item SKUs that were missing and the difference in case amounts. 
+'''

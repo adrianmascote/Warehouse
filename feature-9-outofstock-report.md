@@ -37,30 +37,47 @@
 
 ## Key Entities 
 * Manager 
-* InventoryRecord 
+* Inventory
 * Item 
+* StorageZone
+
 
 ## Initial Data Model 
 
-* **InventoryRecord** (Referenced for 'current_inv_qty', 'min_level', 'bin', 'slot')
-* **Item** (Referenced for 'sku', 'description')
+### InventoryRecord (Referenced)
 
-## Gherkin AC 
+| Field Name | Data Type | Description | 
+|---|---|---|
+| `current_inv_qty` | Integer | The current quantity of the item in stock |
+| `min_level` | Integer | The minimum required stock level before reordering | 
+| `zone_id` | Integer | Foreign key referencing the specific StorageZone | 
+| `sku` | String | The SKU identifier of the item |
+| `description` | String | The description of the item | 
 
-### US-9.1 
-**Scenario: Manager runs the Out-of-Stock report** 
-**Given** the manager is logged into the reporting screen
-**When** the manager clicks "Generate Out-of-Stock Report" 
-**Then** the system should display a list of all items with an inventory count of 0 
+### Item (Referenced)
 
-### US-9.2 
-**Scenario: Manager runs the Low Stock report** 
-**Given** the manager is on the reporting screen
-**When** the manager clicks "Generate Low Stock Report" 
-**Then** the system should display all items where the inventory count at or below the minimum threshold. 
+| Field Name | Data Type | Description | 
+|---|---|---|
+| 'sku' | String | The SKU identifier for the item | 
+| 'description' | String | The description of the item | 
 
-### US-9.3 
-**Scenario: Manager exports the inventory report** 
-**Given** an inventory report is displayed on the screen
-**When** the manager clicks "Export as Spreadsheet" 
-**Then** the system should download a file containing the data of the report. 
+'''## Gherkin AC 
+
+    ### US-9.1 
+    Scenario: Manager runs the Out-of-Stock report 
+    Given: the manager is logged into the reporting screen
+    When: the manager clicks "Generate Out-of-Stock Report" 
+    Then: the system should display a list of all items with an inventory count of 0 
+
+    ### US-9.2 
+    Scenario: Manager runs the Low Stock report 
+    Given the manager is on the reporting screen
+    When: the manager clicks "Generate Low Stock Report" 
+    Then: the system should display all items where the inventory count at or below the minimum threshold. 
+
+    ### US-9.3 
+    Scenario: Manager exports the inventory report 
+    Given: an inventory report is displayed on the screen
+    When the manager clicks "Export as Spreadsheet" 
+    Then: the system should download a file containing the data of the report. 
+'''
