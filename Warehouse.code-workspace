@@ -1,0 +1,29 @@
+{
+	"folders": [
+		{
+			"name": "Warehouse",
+			"path": "."
+		},
+		{
+			"name": "features",
+			"path": "../../speckit-starter-kit/features"
+		},
+		{
+			"name": "backend",
+			"path": "../../speckit-starter-kit/backend"
+		},
+		{
+			"name": "docs",
+			"path": "../../speckit-starter-kit/docs"
+		},
+		{
+			"name": "frontend",
+			"path": "../../speckit-starter-kit/frontend"
+		},
+		{
+			"name": "scripts",
+			"path": "../../speckit-starter-kit/scripts"
+		}
+	],
+	"settings": {}
+}
