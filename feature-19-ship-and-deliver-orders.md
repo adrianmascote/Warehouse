@@ -44,7 +44,7 @@
 | 'delivery_date' | DateTime | The exact date and time it was dropped off to the customer | 
 | 'delivery_status' | String | Current State (e.g., In Transit, Delivered, Failed Delivery) |
 
-'''Gherkin AC 
+Gherkin AC 
 
     ### US-19.1 
     Scenario: Worker loads an order for shipping 

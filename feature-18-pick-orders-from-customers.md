@@ -108,7 +108,7 @@
 
 * Heading / purpose: Active order pick 
 * Primary action: **Confirm Pick**(`oc-cta` when it is primary labeled CTA)
-* Fields, dialogs, icon actions with `aria-label's
+* Fields, dialogs, icon actions with `label's
 * **Empty state:** "No items left to pick." 
 * Loading / error: skeleton/progress; `<v-alert type = "error" > for failures 
 

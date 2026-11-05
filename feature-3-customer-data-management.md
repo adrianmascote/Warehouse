@@ -50,7 +50,7 @@
 
 | Field Name | Data Type | Description | 
 | --- | --- | --- | 
-| 'customer_id' | Integer | Primary Key for the customer |
+| `customer_id` | Integer | Primary Key for the customer |
 | 'name' | String | The name of the customer | 
 | 'shipping_address' | String | The delivery address for the customer |
 | 'is_active' | Boolean | True if the customer is active, False if deactivated | 
