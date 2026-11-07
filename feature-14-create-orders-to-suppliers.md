@@ -20,16 +20,22 @@
 **Independent test:** Verify the system allows the user to update the order status from 'Sent' to 'Delayed' or 'Fulfilled' and accurately shows the expected delivery date. 
 
 ## Functional Requirements
-* The system must allow a worker to select a valid 'supplier_id' from the existing Supplier database to begin an order
-* The system must automatically calcuate the 'total_cost' by multiplying the amount of each item ordered by their cost. 
-* The system must keep a record of who created the order and the exact date it was created. 
-* The system must provide a way to track and update the order 'status' (e.g., Draft, Sent, Delayed, Fulfilled)
+* The system must allow a manager to select a valid `supplier_id` from the existing Supplier database to begin an order
+* The system must automatically calcuate the `total_cost` by multiplying the amount of each item ordered by their cost. S
+* The system must enforce an order status lifecycle: `Draft` -> `Sent` -> `Confirmed` (by suplier)
+* The system must record the employee ID of the manager who created the order and the time of creation 
 
+## Assumptions 
+* The supplier catalog (available items and current unit costs) is already filled in the system. 
+* Managers have the financial authorization to use warehouse funds to purchase orders. 
+
+## Edge Cases 
+
+* **Zero Item Order:**
 ## Key Entities 
 * Manager / Worker 
 * Supplier 
-* Purchase Order (SupplierOrder)
-* Item 
+* 
 
 ## Initial Data Model 
 

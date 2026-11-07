@@ -127,5 +127,17 @@ Implement Feature 18 from @features/feature-18-pick-orders-from-stores.md on bra
 Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests).
 Map every Gherkin scenario in the Test Coverage Mape; run `npm test` before finishing.
 If API routes, payloads, schema, or product rules changed per this spec update @features/reference/api.md, @features/reference/data-model.md, and/or @features/reference/behavior.md in the same PR to match the code. 
+```
+## Definition of Done 
 
-* **Features** 
+* [ ] Backend and frontend implemented per this spec (FR-00N satisfied)
+* [ ] Success Criteria (SC-00N) met 
+* [] All mapped tests pass (`npm test`)
+* [] Test Coverage Map complete 
+* [] `features/reference/data-model.md` updated (if schema changed)
+* [] `features/reference/api.md` updated (if API changed)
+* [] `features/ reference/behavior.md` updated (if product rules changed)
+
+## Out of Scope 
+* Physical robotic picking automation
+* Packing and shipping logic (handled in Feature 19)
