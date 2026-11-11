@@ -94,6 +94,15 @@
     "worker_id": 105        
 }   
 ```
+
+**Success Response:** 
+```json
+{
+    "movement_id":883, 
+    "message": "Item 44 successfully stored in Zone 12."
+    "new_qty_on_hand":150
+}
+```
 ## Screen Requirements 
 
 ### [View: Put-Away Scanner] - route name `put-away-scanner` 
