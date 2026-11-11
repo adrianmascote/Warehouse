@@ -61,6 +61,16 @@
 | `start_time` | DateTime | The exact date and time the worker started picking |
 | `end_time` | DateTime | The exact date and time the worker finished picking | 
 
+### InventoryMovement 
+
+| Field Name | Data Type | Constraints | Description | 
+|---|---|---|---|
+| `movement_id` | Integer | PK, Not Null | Unique identifier for this specific inventory transaction | 
+| `item_id` | Integer | FK, Not Null | References the specific item being moved | 
+| `zone_id` | Integer | FK, Not Null | References the zone where the item is being placed | 
+| `quantity` | Integer | Not Null | References the amount that is being moved of that specific `item_id` | 
+
+
 ## Gherkin AC 
 
  ### US-18.1 
@@ -92,9 +102,9 @@
 
 | Method | Endpoint | Auth | Purpose |
 |---|---|---|---|
-|`GET`| `/api/orders/{order_id}/`claim` | Yes | Assins the optimized list of items to pick |
-|`POST`| `/api/orders/{order_id}/`claim` | Yes | Assigns the order to the `worker_id` |
-| `PATCH` | `/api/orders/items/{order_item_id} | Yes | Updates picked amount |
+|`GET`| `/api/orders/{order_id}/pick-list` | Yes | Fetches the optimized list items and storage zones to pick |
+|`POST`| `/api/orders/{order_id}/claim` | Yes | Assigns the order to the `worker_id` and creates the `PickTask`|
+| `POST` | `/api/inventory-movements` | Yes | Records the exact amount picked off the shelf (updates the stock) |
 
 **Create request body:**
 ```json 
