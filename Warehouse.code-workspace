@@ -5,10 +5,6 @@
 			"path": "."
 		},
 		{
-			"name": "features",
-			"path": "../../speckit-starter-kit/features"
-		},
-		{
 			"name": "backend",
 			"path": "../../speckit-starter-kit/backend"
 		},
