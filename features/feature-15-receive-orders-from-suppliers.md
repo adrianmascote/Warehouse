@@ -75,7 +75,7 @@
  ### US-15.1 
 **Scenario: Worker receives a full delivery** 
 **Given** a worker is logged into the receiving screen 
-**When** the worker enters the order ID and confirms all expected item amounts match the physical deliveyr 
+**When** the worker enters the order ID and confirms all expected item amounts match the physical delivery 
 **Then** the system should create a new `ReceivingLog`
 **And** update the `SupplierOrder` status to `Received`. 
 
