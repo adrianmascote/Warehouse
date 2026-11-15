@@ -63,7 +63,6 @@
 | `driver_id` | Integer | FK, Not Null | The driver who reported the issue | 
 | `qty_expected` | Integer | Not Null | What the digital records say |
 | `qty_delivered` | Integer | Not Null | What was physically handed over | 
-| `reason_code` | String | Not Null | What was physically handed over | 
 | `reason_code` | String | Not Null | ENUM: Missing, Damaged, Overage | 
 | `status` | String | Not Null | ENUM: Pending, Resolved, Rejected | 
 
@@ -121,7 +120,11 @@
 * Fields: Reason Dropdown (Missing, Damaged, Overage), Actual Qty Input. 
 * Loading/error: `<v-alert type="error">` for missing reason codes. 
 
-
+### [View: Manager Discrepancy Dashboard] - route name `discrepancies-review`
+* Heading/ purpose: Review Pending Delivery Issues 
+* Primary action: **Approve Adjustment** 
+* Secondary action: **Reject Claim** 
+* **Empty state:** "No pending delivery discrepancies." 
 
 ## Test Coverage Map 
 
