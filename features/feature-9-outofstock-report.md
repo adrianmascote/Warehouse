@@ -136,8 +136,6 @@ Ensure the CSV export endpoint dynamically handles whichever report (OOS or Low 
 * [ ] `features/reference/api.md` updated (if API changed)
 
 ## Out of Scope 
-
-* Automated purchasing or automatic PO generation.
 * Forecasting future low stock events based on sales patterns. 
 
 
