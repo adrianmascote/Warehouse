@@ -8,7 +8,7 @@
 **So that** I don't waste time walking back and forth across the warehouse.
 
 **Priority:** P1 
-**Indpendent test:** Verify the system sorts the items on the pick list sequentially by `aisle`, `slot`, and `bin` to generate the shortest walking route.
+**Independent test:** Verify the system sorts the items on the pick list sequentially by `aisle`, `slot`, and `bin` to generate the shortest walking route.
 **Acceptance scenarios:** see ### US-18.1 under Gherkin AC 
 
 ### US-18.2: Update Order to Picked 
@@ -17,7 +17,7 @@
 **So that** I know it is ready to be packed and shipped
 
 **Priority:** P1 
-**Indpendent test:** Verify the system updates the order status to `Picked`, logs `end_time`, and decrements inventory once the worker confirms all items are collected. 
+**Independent test:** Verify the system updates the order status to `Picked`, logs `end_time`, and decrements inventory once the worker confirms all items are collected. 
 **Acceptance scenarios:** see ### US-18.2 under Gherkin AC 
 
 ## Functional Requirements 
@@ -35,15 +35,15 @@
 
 ## Edge Cases 
 * **Insufficient Inventory (Short Pick):** The scanner directs the worker to a bin, but the shelf is empty or has fewer units than ordered. The worker can flag a shortage, which alerts the manager and pauses order completion.
-* **Concurrent Claiming:** Two workers attemtp to claim the same `CustomerOrder` simultaneously; the database locks the claim and returns `409 Conflict` to the second worker. 
+* **Concurrent Claiming:** Two workers attempt to claim the same `CustomerOrder` simultaneously; the database locks the claim and returns `409 Conflict` to the second worker. 
 * **Wrong Bin or Item Scan:** If the worker scans a bin or SKU that does not match the directed pick step, the scanner displays an error and blocks confirmation.
 
 
 ## Success Criteria 
 
-* Worker successfully follow the Aisle/Slot/Bin pick route, scan all items, and update the order status to `Picked`. 
+* Workers successfully follow the Aisle/Slot/Bin pick route, scan all items, and update the order status to `Picked`. 
 * Pick tasks log exact `start_time` and `end_time` for performance tracking. 
-* The routing algorithm succesfully groups items by `aisle`, `slot`, and `bin` order.
+* The routing algorithm successfully groups items by `aisle`, `slot`, and `bin` order.
 
 ## Key Entities 
 * **Worker / Manager** 
@@ -58,7 +58,7 @@
 ### PickTask 
 
 | Field Name | Data Type | Constraints | Description | 
-|---|---|---|
+|---|---|---|---|
 | `pick_id` | Integer | PK, Not Null | Unique identifier for this specific picking assignment | 
 | `order_id`| Integer | FK, Not Null | Foreign key referencing the `CustomerOrder` being picked | 
 | `worker_id` | Integer | FK, Not Null | Foreign key referencing the worker gathering the items | 
@@ -72,8 +72,9 @@
 |---|---|---|---|
 | `movement_id` | Integer | PK, Not Null | Unique identifier for this specific inventory transaction | 
 | `item_id` | Integer | FK, Not Null | References the specific item being moved | 
-| `zone_id` | Integer | FK, Not Null | References the `StorageZone` (Aisle/Slot/Bin)the item is being picked from | 
-| `worker_id` | Integer | FK, Not Null | The quantity picked off the shelf (subtracts from `qty_on_hand`)|
+| `zone_id` | Integer | FK, Not Null | References the `StorageZone` (Aisle/Slot/Bin) the item is being picked from | 
+| `worker_id` | Integer | FK, Not Null | References the worker who picked the item | 
+| `quantity` | Integer | Not Null, > 0 | The quantity picked off the shelf (subtracts from `qty_on_hand`) |
 | `movement_date` | DateTime | Not Null | Exact timestamp of the pick movement | 
 
 ### StorageZone (Referenced from Feature 8) 
@@ -124,7 +125,11 @@
 
 **Create request body:**
 ```json 
-{"qty_picked" : 3}
+{
+    "item_id" :44,
+    "zone_id": 12,
+    "qty_picked" : 3
+}
 
 ```
 
@@ -142,13 +147,13 @@
 
 | Story | Scenario | Test file | Test name | 
 |-------|----------|-----------|-----------|
-| US-18.1 | Scanner directs worker to the next closest item | `backend/tests/Picking.test.js` |  `User creates a new list` | 
+| US-18.1 | Scanner directs worker to the next closest item | `backend/tests/picking.test.js` | `System sorts pick list by Aisle, Slot, and Bin order` |
 | US-18.2 | Worker finishes gathering the order | `backend/tests/picking.test.js` | `Worker finishes gathering order` |
 
 ## Agent Implementation request 
 
 ```text
-Implement Feature 18 from @features/feature-18-pick-orders-from-customers.md on branch `feature/18-pick-orders-from-stores`. 
+Implement Feature 18 from @features/feature-18-pick-orders-from-customers.md on branch `feature/18-pick-orders-from-customers`. 
 
 Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests).
 Map every Gherkin scenario in the Test Coverage Map; run `npm test` before finishing.
@@ -158,11 +163,11 @@ If API routes, payloads, schema, or product rules changed per this spec update @
 
 * [ ] Backend and frontend implemented per this spec 
 * [ ] Success Criteria met 
-* [] All mapped tests pass (`npm test`)
-* [] Test Coverage Map complete 
-* [] `features/reference/data-model.md` updated (if schema changed)
-* [] `features/reference/api.md` updated (if API changed)
-* [] `features/reference/behavior.md` updated (if product rules changed)
+* [ ] All mapped tests pass (`npm test`)
+* [ ] Test Coverage Map complete 
+* [ ] `features/reference/data-model.md` updated (if schema changed)
+* [ ] `features/reference/api.md` updated (if API changed)
+* [ ] `features/reference/behavior.md` updated (if product rules changed)
 
 ## Out of Scope 
 * Physical robotic picking automation
