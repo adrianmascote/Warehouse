@@ -22,9 +22,21 @@
 
 * The system must allow a worker to use a scanner to log an order onto a specific delivery 'Route' 
 * The system must automatically generate a 'BillOfLading' tracking record when the item is loaded. 
-* The system must allow a driver to pull up their route o a mobile device and mark specific orders as 'Delivered'. 
+* The system must allow a driver to pull up their route on a mobile device and mark specific orders as 'Delivered'. 
 * The system must log the exact date and time for the final delivery 
 
+## Assumptions 
+* Orders have already been picked (Feature 18) and packed at the shipping dock before loading. 
+* Delivery routes and assigned drivers (`worker_id`) are pre-configured in the system.
+
+## Edge Cases 
+* **Order Not Ready for Shipping:** If a worker scans a `CustomerOrder` whose status is not `Picked`/`Packed`, the system blocks loading and returns `409 Conflict`.
+* **Failed Delivery:** If a customer is unavailable, the driver can mark `delivery_status` as `Failed Delivery` with a note instead of `Delivered`.
+* **Duplicate Load Scan:** Scanning an order that already has an active `BillOfLading` prevents creating a duplicate shipment record. 
+
+## Success Criteria 
+* Scanning a packed order at the dock generates a `BillOfLading` and updates the `CustomerOrder` status to `Shipped`. 
+* Drivers can view only their assigned routes and confirm deliveries with an exact `delivery_date`.
 ## Key Entities 
 * Worker (Driver)
 * CustomerOrder 
@@ -36,13 +48,35 @@
 ### BillOfLading 
 
 | Field Name | Data Type | Constraints | Description | 
-|---|---|---|
+|---|---|---|---|
 | `bol_id` | Integer | PK, Not Null | Unique identifier for this shipping record | 
 | `order_id` | Integer | FK, Not Null | Foreign key referencing the customer order being shipped |
-| `route_id` | Integer | Foreign key referencing the driver assigned to the delivery route |
+| `route_id` | Integer | FK, Not Null | Foreign key referencing the delivery `Route` |
 | `shipped_date` | DateTime | Not Null | The exact date and time the order was loaded onto the truck |
 | `delivery_date` | DateTime | Nullable | The exact date and time it was dropped off to the customer (Null until delivered) | 
-| `delivery_status` | String | Current State (e.g., In Transit, Delivered, Failed Delivery) |
+| `delivery_status` | String | Not Null | ENUM: `In Transit`, `Delivered`, `Failed Delivery` |
+
+### Route (Referenced)
+
+| Field Name | Data Type | Constraints | Description | 
+|---|---|---|---|
+|`route_id` | Integer | PK, Not Null | Unique identifier for the delivery route | 
+| `driver_id` | Integer | FK, Not Null | Foreign key referencing the assigned `Worker` (Driver) | 
+
+## Gherin AC 
+
+### US-19.1 
+**Scenario: Worker loads an order for shipping** 
+**Given:** A packed order is waiting at the loading dock 
+**When:** a worker scans the package barcode and assigns it to a delivery route
+**Then:** the system creates `BillOfLading` record and updates the `CustomerOrder` status to `Shipped`. 
+
+### US-19.2 
+**Scenario: Driver drops off the package**
+**Given:** the driver has arrived at the customer's address
+**When:** they tap "Confirm Delivery" on their mobile device 
+**Then:** the system logs the current timestamp as `delivery_date` and updates the status to `Delivered`.
+
 
 ## Data Ownership & Isolation 
 
@@ -52,22 +86,24 @@
 | **Write scope** | Only when row matches `id` and `req.user.id` |
 | **Create scope** | New BOL records owned by the system / authenticated loader | 
 | **Cross-user-access** | Another user's resource -> `404` (not `403`) | 
-| **UI scope** | UI shows only routes 
+| **UI scope** | UI shows only routes assigned to the signed-in driver; Managers can view all shipments. |
+| **Implementation** | Shared ownership helper in `app/authorization/`. |
+
 
 ## API Requirements 
 
 | Method | Endpoint | Auth | Purpose | 
 |---|---|---|---|
 |`POST` | `/api/shipments` | Yes | Generates the BillOfLading and sets status to `Shipped` when loaded | 
-| `GET` | `/api/routes/active` | Yes | Gets the driver's specific route and pending deliveries. 
+| `GET` | `/api/routes/active` | Yes | Gets the driver's specific route and pending deliveries. |
 | `PATCH` | `/api/shipments/{bol_id}/deliver` | Yes | Logs the delivery_date and updates status to `Delivered` | 
 
 ## Screen Requirements 
 
 ### [View: Loading Dock Scanner] - route name `shipping-dock`
 * Heading / purpose: Load Truck 
-* Primary action: **Generate BOL** (`oc_cta`)
-* Fields, dialogs, icon actions with labels 
+* Primary action: **Generate BOL** (`oc-cta`)
+* Fields: Route Selector Dropdown, Order barcode scan Input, Loaded Orders List
 * **Empty state:** "No packed orders waiting for shipment."
 
 ### [View: Driver Route] - route name `driver-route`
@@ -80,7 +116,7 @@
 | Story | Scenario | Test file | Test name | 
 |---|---|---|---|
 | US-19.1 | Worker loads an order for shipping | `backend/tests/shipping.test.js` | `System generates BOL on truck load` | 
-| US-19.2 | Driver drops off the package | `backend/tests/delivery.test.js | `System logs delivery date and status` | 
+| US-19.2 | Driver drops off the package | `backend/tests/delivery.test.js` | `System logs delivery date and status` | 
 
 ## Agent Implementation request 
 ```text 
@@ -88,14 +124,14 @@ Implement Feature 19 from @features/feature-19-ship-and-deliver-orders.md on bra
 
 
 Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests).
-Map every Gherkin scenario in the Test Coverage Mape; run `npm test` before finishing.
+Map every Gherkin scenario in the Test Coverage Map; run `npm test` before finishing.
 If API routes, payloads, schema, or product rules changed per this spec update @features/reference/api.md, @features/reference/data-model.md, and/or @features/reference/behavior.md in the same PR to match the code. 
 ```
 
 
 ## Definition of Done 
-* [ ] Backend and frontend implemented per this spec (FR-00N satisfied)
-* [ ] Success Criteria (SC-00N) met 
+* [ ] Backend and frontend implemented per this spec 
+* [ ] Success Criteria met 
 * [ ] All mapped tests pass (`npm test`)
 * [ ] Test Coverage Map complete 
 * [ ] `features/reference/data-model.md` updated (if schema changed)
@@ -107,14 +143,3 @@ If API routes, payloads, schema, or product rules changed per this spec update @
 * GPS tracking of the delivery truck in real-time 
 * Customer signature capture on the mobile device
 
-### US-19.1 
-**Scenario: Worker loads an order for shipping** 
-**Given:** A packed order is waiting at the loading dock 
-**When:** a worker scans the package barcode and assigns it to the delivery truck 
-**Then:** the system should create a BillOflading record and update the order status to 'Shipped' 
-
-### US-19.2 
-**Scenario: Driver drops off the package**
-**Given:** the driver has arrived at the customer's address 
-**When:** they tap "Confirm Delivery" on their scanner or mobile device 
-**Then:** the system should log the current time as 'delivered_date' and update the status to 'Delivered'

@@ -4,11 +4,11 @@
 
 ### US-13.1 Worker Login
 **As a** warehouse worker
-**I want to** log into an RF scanner using my Worker ID and PIN 
-**So that** the system can track the asks I complete during my shift 
+**I want to** log into an RF scanner using my Worker ID and Password
+**So that** the system can track the tasks I complete during my shift 
  
 **Priority:** P1 
-**Indpendent test:** Verify the system authenticates valid worker credentials and grants access to the scanner dashboard. 
+**Independent test:** Verify the system authenticates valid worker credentials and grants access to the scanner dashboard. 
 **Acceptance scenarios:** see ### US-13.1 under Gherkin AC 
 
 ### US-13.2: Role-Based Access Control 
@@ -18,7 +18,7 @@
 
 **Priority:** P1
 **Indpendent test:** Verify that the user with a "Worker" role is denied access to management-only screens. 
-**Acceptance scenarios:** see ### US-13.2 under Gherkin A
+**Acceptance scenarios:** see ### US-13.2 under Gherkin AC
 
 ### US-13.3: Worker Logout 
 **As a** warehouse worker
@@ -39,6 +39,11 @@
 * Workers already have active profile made in the system by human resources.
 * The scanners are connected to the warehouse's internal network/Wi-Fi.
 
+
+## Edge Cases 
+* **Invalid Credentials:** Entering a wrong Worker ID or Password returns `401 Unauthorized` with a generic `"Invalid Credentials"` message.
+* **Forgotten Logout:** If a worker forgets to log out before the next shift, logging in with a new Worker ID on the same scanner automatically ends the previous `DeviceSession`.
+
 ## Success Criteria 
 * Valid credentials start a session and route the user to the main menu
 * Invalid credentials display a clear error without revealing if the ID or password was wrong. 
@@ -46,8 +51,9 @@
 
 ## Key Entities 
 
-* Worker 
-* DeviceSession
+* **Worker** 
+* **DeviceSession**
+* **WorkerAuthorization**
 
 ## Initial Data Model 
 
@@ -59,13 +65,13 @@
 | `password_hash` | String | Not Null | The securely hashed password | 
 | `role` | String | Not Null | The system access level (e.g., Worker, Manager) |
 
-### DeciveSession 
+### DeviceSession 
 
 | Field Name | Data Type | Constraints | Description |
 |---|---|---|
-| `session_id` | Integer | PK, Not Null  Primary key for the device session |   
+| `session_id` | Integer | PK, Not Null | Primary key for the device session |   
 | `worker_id` | Integer | FK, Not Null | Foreign key referencing teh Worker logged in | 
-| `login_time` | DateTime | PK, Not Null | The exact date and time the session started | 
+| `login_time` | DateTime | Not Null | The exact date and time the session started | 
 | `logout_time` | DateTime | Nullable | The exact date and time the session ended (Null whle active) |
 
 
@@ -83,7 +89,7 @@
 ### US-13.2 
 **Scenario: Worker attempts to access restricted area** 
 **Given** a user with a "Worker" role is logged in
-**When** the user attempts to open the user attempts to open the Manager reporting screen 
+**When** the user attempts to open the Manager reporting screen 
 **Then** the system should display an "Access Denied" Error message
 
 
@@ -94,7 +100,7 @@
 **Then:** the system should end the session and return to the main login screen. 
 
 
-## Data Ownership & Isolaton
+## Data Ownership & Isolation
 
 | Rule | Requirement | 
 |---|---|
@@ -109,7 +115,7 @@
 
 | Method | Endpoint | Auth | Purpose | 
 |---|---|---|---|
-| `POST` | `/api/auth/login` | No | Vaidates credentials and creates a session | 
+| `POST` | `/api/auth/login` | No | Validates credentials and creates a session | 
 | `POST` | `/api/auth/logout` | Yes | Destroys the active session and instantiates a `logout_time` | 
 | `GET` | `/api/auth/me` | Yes | Fetches the current user's profile and role for UI rendering | 
 
@@ -121,15 +127,15 @@
 * Fields: `Worker ID` (text input), `Password` (password input)
 * Loading / error: `<v-alert type="error">` for "Invalid Credentials" 
 
-### [View: Main Menu Dashboard] - route name `login`
+### [View: Main Menu Dashboard] - route name `scanner-dashboard`
 * Heading / purpose: Main Task Menu
-* Primary action: **Select Task** (`oc-cta` when it is primary labeled CTA)
+* Primary action: **Select Task** (`oc-cta`)
 * Secondary action: **Log out** 
 
 ## Test Coverage Map
 | Story | Scenario | Test file | Test name | 
 |---|---|---|---|
-| US-13.1 | Worker successfully logs into scanner | `backend/tests.auth.test.js` | `System authenticates valid worker` | 
+| US-13.1 | Worker successfully logs into scanner | `backend/tests/auth.test.js` | `System authenticates valid worker` | 
 | US-13.2 | Worker attempts to access restricted area | `backend/tests/auth.test.js` | `System blocks worker from manager views` | 
 | US-13.3 | Worker logs out at end of shift | `backend/tests/auth.test.js` | `System terminates session on logout` | 
 
@@ -139,12 +145,12 @@
 Implement Feature 13 from @features/feature-13-scanner-login.md on branch `feature/13-scanner-login`. 
 
 Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests).
-Map every Gherkin scenarion in the TEst Coverage Map; run `npm test` to verify the order lifecycle strict status transitions. 
+Map every Gherkin scenario in the Test Coverage Map; run `npm test` to verify authentication, RBAC restrictions, and session logout. 
 ```
 
 ## Definition of Done 
-* [ ] Backend and frontend implemented per this spec (FR-00N satisfied)
-* [ ] Success Criteria (SC-00N) met 
+* [ ] Backend and frontend implemented per this spec 
+* [ ] Success Criteria met 
 * [ ] All mapped tests pass (`npm test`)
 * [ ] Test Coverage Map complete 
 * [ ] `features/reference/data-model.md` updated (if schema changed)
@@ -154,5 +160,5 @@ Map every Gherkin scenarion in the TEst Coverage Map; run `npm test` to verify t
 ## Out of Scope 
 * Biometric login (fingerprint / FaceID)
 * Two-factor authentication (2FA) via SMS or email 
-
+* Desktop web portal login for managers (handled in Feature 20).
 
