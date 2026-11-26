@@ -114,6 +114,25 @@
 | US-1.2 | Workers updates inventory quantity | `backend/tests/inventory.test.js` | `System updates existing inventory quantity` | 
 | US-1.3 | Manager deletes an inventory record | `backend/tests/inventory.test.js` | `Manager deletes inventory record while worker receives 403` |
 
+## Screen Requirements 
+### [View: Inventory Management Dashboard] - route name `manage-inventory`
+
+* Heading / Purpose: Manage Warehous Inventory 
+* Primary action: **Add Inventory** (`oc-cta`)
+* Secondary actions: **Edit**, **Delete** (Manager only)
+* Fields: Item Dropdown (SKU/Description), Storage Zone Dropdown, Current Qty, Min Level, Max Level
+* **Empty state:** "No inventory records found."
+* Loading/error: `<v-alert type = "error">` for negative quantities or duplicate item/zone conflicts.
+
+## Test Coverage Map 
+
+| Story | Scenario | Test file | Test name | 
+|---|---|---|---|---|
+| US-1.1 | Worker adds new inventory | `backend/tests/inventory.test.js` | `System creates a new inventory record` | 
+| US-1.2 | Worker updates inventory quantity | `backend/tests/inventory.test.js` | `System updates existing inventory quantity` | 
+| US-1.3 | Manager deletes an inventory record | `backend/tests/inventory.test.js` | `Manager deletes inventory record while worker receives 403` | 
+
+
 ## Agent Implementation Request 
 
 ```text 
