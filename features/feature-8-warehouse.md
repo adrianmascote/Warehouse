@@ -18,7 +18,7 @@
 **So that** the system reflects changes accurately if a warehouse layout is reorganized.
 
 **Priority:** P2 
-**Independent test:** Verify a manager can edit a location's aise, slot, bin, or type and the system saves the update.
+**Independent test:** Verify a manager can edit a location's aisle, slot, bin, or type and the system saves the update.
 **Acceptance scenarios:** see ### US-8.2 under Gherkin AC 
 
 ### US-8.3: Delete Warehouse Location 
@@ -27,7 +27,7 @@
 **So that** workers don't accidentally assign inventory to a bin that doesn't exist.
 
 **Priority:** P3
-**Independent test:** Verify a maanger can permanently remove an empty location from the active locations list.
+**Independent test:** Verify a manager can permanently remove an empty location from the active locations list.
 **Acceptance scenarios:** see ### US-8.3 under Gherkin AC 
 
 ## Functional Requirements 
@@ -40,18 +40,18 @@
 * This feature applies to a single physical warehouse facility (no multi-warehouse mapping required). 
 * Standard workers do **not** have permission to manage storage zones. 
 
-## Edge cases 
-* **Deletion Protection (Foreign Key Constraint):** If a manager attempts delete a location containing active inventory, the system must block the action and throw a `409 Conflict` error, instructing the manager to transfer the inventory first. 
-* **Duplicate Coordinates:** The system must prevent creating a new location with an `(ailse, slot, bin)` combination that already exists.
+## Edge Cases 
+* **Deletion Protection (Foreign Key Constraint):** If a manager attempts to delete a location containing active inventory, the system must block the action and throw a `409 Conflict` error, instructing the manager to transfer the inventory first. 
+* **Duplicate Coordinates:** The system must prevent creating a new location with an `(aisle, slot, bin)` combination that already exists.
 
 ## Success Criteria 
 * Managers can successfully perform full CRUD operations (Create, Read, Update, Delete) on storage zones. 
 * The UI immediately reflects any updates or deletions without requiring a hard page refresh. 
-* The database strictly enforces relational integrity so inventory never points at a empty zone. 
+* The database strictly enforces relational integrity so inventory never points at an empty zone. 
 
 ## Key Entities 
-* Storage Zone 
-* Manager 
+* **StorageZone** 
+* **Manager** 
 
 ## Initial Data Model 
 
@@ -62,7 +62,7 @@
 | `zone_id` | Integer | PK, Not Null | Primary key for the storage location | 
 | `aisle` | String | Not Null, Unique (with slot, bin) | The warehouse aisle identifier (e.g., `A4`) | 
 | `slot` | String | Not Null, Unique (with aisle, bin) | The rack/slot identifier within the aisle (e.g., `S12`) |
-| `bin` | String | Not Null, Unique (with aisle, slot) | The specific bin/shelflevel within the slot (e.g., `B2`) |
+| `bin` | String | Not Null, Unique (with aisle, slot) | The specific bin/shelf level within the slot (e.g., `B2`) |
 | `zone_type` | String | Not Null | The type of storage location (e.g., Standard, Refrigerated) |
 
 
@@ -88,7 +88,7 @@
 **When** the manager clicks "Delete" on the location record 
 **Then** the system should remove the location from the active database.
 
-### US-8.3 (Edge Cases)
+### US-8.3 (Edge Case)
 **Scenario: Manager attempts to delete a populated storage location**
 **Given** a storage location exists in the system and has active inventory items
 **When** the manager clicks "Delete" on the location record 
@@ -101,7 +101,7 @@
 | **Read scope** | Managers can view all zones. Standard workers fetch zones strictly for picking/put-away forms. |
 | **Write scope** | Only Managers can update or delete zones. | 
 | **Create scope** | Only Managers can create new zones. | 
-| **Cross-user-access** | Standard worker attempting POST/PATCH/DELETE -> `403 Access Denied`. |
+| **Cross-user-access** | Standard worker attempting POST/PATCH/DELETE -> `403 Forbidden`. |
 | **UI scope** | The Zone Management Dashboard is hidden from standard workers. | 
 | **Implementation** | Role-based access control (RBAC) enforced via a shared helper in `app/authorization/`. |
 
@@ -114,7 +114,7 @@
 | `PATCH` | `/api/zones/{zone_id}` | Yes (Manager) | Updates a location's aisle, slot, bin, or type |
 | `DELETE` | `/api/zones/{zone_id}` | Yes (Manager) | Deletes a location (if empty) | 
 
-## Screen Requirement 
+## Screen Requirements
 
 ### [View: Zone Management Dashboard] - route name `manage-zones`
 * Heading / purpose: Manage Warehouse Locations 
@@ -126,16 +126,16 @@
 ## Test Coverage Map 
 | Story | Scenario | Test file | Test name | 
 |---|---|---|---|
-| US-8.1 | Manager adds a new storage zone | `backend/tests/zones.teset.js` | `System creates a new storage zone` | 
+| US-8.1 | Manager adds a new storage zone | `backend/tests/zones.test.js` | `System creates a new storage zone` | 
 | US-8.2 | Manager updates a storage zone | `backend/tests/zones.test.js` | `System updates existing zone attributes` | 
-| US-8.3 | Manager deletes an empty storage zones | `backend/tests/zones.test.js` | `System deletes ampty zone` | 
+| US-8.3 | Manager deletes an empty storage zone | `backend/tests/zones.test.js` | `System deletes empty zone` | 
 | US-8.3 | Manager attempts to delete a populated storage zone | `backend/tests/zones.test.js` | `System rejects deletion of populated zone with 409 Conflict` | 
 
 ## Agent Implementation request 
 
 ```text 
 
-Implement Feature 8 from @features/feature-8-warehouse.md on branch `feature/8-warehouse.md`.
+Implement Feature 8 from @features/feature-8-warehouse.md on branch `feature/8-warehouse`.
 
 Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests).
 Map every Gherkin scenario in the Test Coverage Map; run `npm test` before finishing.
@@ -145,8 +145,8 @@ Ensure the DELETE route explicitly checks the Inventory table and throws a 409 C
 ## Definition of Done 
 
 * [ ] Backend and frontend implemented per this spec 
-* [ ] Success Criteria met (`npm test`)
-* [ ] All mapped tests pass(`npm test`)
+* [ ] Success Criteria met 
+* [ ] All mapped tests pass (`npm test`)
 * [ ] Test Coverage Map complete 
 * [ ] `features/reference/data-model.md` updated (Added StorageZone table)
 * [ ] `features/reference/api.md` updated (Added zone CRUD endpoints)

@@ -16,7 +16,7 @@
 **So that** I have an accurate count of what is available to sell to customers. 
 
 **Priority:** P1 
-**Independent test**Verify the system increases the available inventory for the specific item put away 
+**Independent test** Verify the system increases the available inventory for the specific item put away 
 
 ### US-16.3: Directed Put-Away Instructions 
 **As a** worker 
@@ -24,7 +24,7 @@
 **So that** I don't waste time searching for space and items are always stored in the right storage type. 
 
 **Priority:** P1
-**Independent test:** Verify that scanning a pending receivied item returns a directed target location (`ailse`, `slot`, `bin`) matching the item's storage type, and that scanning a mismatched bin triggers a warning.
+**Independent test:** Verify that scanning a pending received item returns a directed target location (`aisle`, `slot`, `bin`) matching the item's storage type, and that scanning a mismatched bin triggers a warning.
 **Acceptance scenarios:** see ### US-16.3 under Gherkin AC
 
 ## Functional Requirements 
@@ -33,7 +33,7 @@
 * The system must record the `worker_id` of the person who moved the items and timestamp the exact `movement_date`. 
 * The system must automatically trigger an update to the inventory, adding the put-away quantity to the item's total `qty_on_hand`. 
 * When a worker scans a received item, the system must automatically calculate and display step-by-step put-away directions showing the target **Aisle, Slot, and Bin** (prioritizing existing bins holding the same SKU, or the nearest available bin matching the item's required `zone_type`).
-* The system must validate the worker's scanned bin barcode against the directed target location and prompt for confirmation (or a split put-away ovrride) if they scan a different bin.
+* The system must validate the worker's scanned bin barcode against the directed target location and prompt for confirmation (or a split put-away override) if they scan a different bin.
 * The system must automatically sort the worker's pending put-away list by target `aisle`, `slot`, and `bin` (ascending) to generate the most efficient walking route with minimal backtracking 
 
 ## Assumptions 
@@ -70,14 +70,14 @@
 | `zone_id` | Integer | FK, Not Null | References the physical shelf/location it was placed in | 
 | `worker_id` | Integer | FK, Not Null |  Foreign key referencing the worker who stored it | 
 | `quantity` | Integer | Not Null, >0 | The amount of the item that was put away in the specific zone | 
-| `movement_date` | DateTime | FK, Not Null | The exact date and time the items were put on the shelves | 
+| `movement_date` | DateTime | Not Null | The exact date and time the items were put on the shelves | 
 
 
 ### StorageZone (Referenced from Feature 8)
 | Field Name | Data Type | Constraints | Description | 
 |---|---|---|---|
 | `zone_id` | Integer | PK, Not Null | Primary key for the storage location | 
-| `ailse` | String | Not Null | Target aisle identifier (e.g., `A4`) |
+| `aisle` | String | Not Null | Target aisle identifier (e.g., `A4`) |
 | `slot` | String | Not Null | Target slot identifier (e.g., `S12`) | 
 | `bin` | String | Not Null | Target bin identifier (e.g., `B2`) | 
 | `zone_type` | String | Not Null | Storage type (e.g., Standard, Refrigerated) | 
@@ -86,7 +86,7 @@
 
 ### US-16.1 
 **Scenario: Worker Stores items in a specific zone**
-**Given** a worker has a cart of newly receivied items on the dock 
+**Given** a worker has a cart of newly received items on the dock 
 **When** They scan the item, enter the quantity, and scan the destination `zone_id`
 **Then** the system should log the new `InventoryMovement` record
 **And** mark that specific quantity as successfully put away. 
@@ -102,7 +102,7 @@
 **Scenario: System provides directed put-away instructions** 
 **Given** a worker is on the Put-Away Scanner screen with newly received items 
 **When** the worker scans an item barcode 
-**Then** the system displays the directed target locaation (e.g., "Go to Ailse A4 -> Slot S12 -> Bin B2") matching the item's required storage type
+**Then** the system displays the directed target location (e.g., "Go to Aisle A4 -> Slot S12 -> Bin B2") matching the item's required storage type
 
 ### US-16.3 (Edge Case)
 **Scenario: Worker scans the wrong bin barcode** 
@@ -122,9 +122,8 @@
 
 | Method | Endpoint | Auth | Purpose | 
 |---|---|---|---|
-| `GET` | `/api/receiving/pending-putaway` | Yes | Fetches pending dock items paired with their suggested `aisle`/`slot`/`bin` |
+| `GET` | `/api/receiving/pending-putaway` | Yes | Fetches pending dock items paired with their suggested aisle/slot/bins `(aisle, slot,bin)` |
 | `GET` | `/api/put-away/suggest/{item_id}` | Yes | Returns the recommended target `zone_id`, `aisle`, `slot`, and `bin` for the scanned item | 
-| `GET` | `/api/receiving/pending-putaway` | Yes | Fetches all received items sitting on the dock | 
 | `POST` | `/api/inventory-movements` | Yes | Submits the put-away action and updates the stock | 
 
 **Movement request body:** 
@@ -153,7 +152,7 @@
 * Primary action: **Confirm Location** (`oc-cta`)
 * Fields: Pending Item List, Item Barcode Scan Input, Location barcode scan input, and Quantity Input field. 
 * **Visual indicator:** A green success toast notification displaying "X Items added to stock" when the database confirms the save 
-* **Put-Away Direction Banner:** Prominent step-by-step banner displaying the target coordinates (eg., `Aisle A4 * Slot S12 * Bin B2`) as soon as an item is scanned. 
+* **Put-Away Direction Banner:** Prominent step-by-step banner displaying the target coordinates (e.g., `Aisle A4 * Slot S12 * Bin B2`) as soon as an item is scanned. 
 
 ## Definition of Done 
 * [ ] Backend and frontend implemented per this spec 
@@ -179,10 +178,10 @@
 ## Agent Implementation request 
 
 ```text 
-Implement Feature 16 from @ features/feature-16-put-away.md on branch `feature/16-put-away`. 
+Implement Feature 16 from @features/feature-16-put-away-orders-from-suppliers.md on branch `feature/16-put-away`. 
 
 Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests).
-May every Gherkin scenario in the Test Coverage Map; run `npm test` to verify the `POST / api/inventory-movements` endpoint successfully increments the `qty_on_hand` in the Item model. 
+Map every Gherkin scenario in the Test Coverage Map; run `npm test` to verify the `POST /api/inventory-movements` endpoint successfully increments the `qty_on_hand` in the Item model. 
 ```
 
 

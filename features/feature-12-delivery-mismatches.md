@@ -8,8 +8,9 @@
 **So that** I can see if the warehouse failed to complete the order accurately. 
 
 **Priority:** P1
-**Indpendent test:** verify that a driver can submit a discrepancy reason and the system updates the item's status to `Diputed`.  
-**So that** I can investgate goods that may have been dmaged or lost on the delivery route. 
+**Independent test:** verify that a driver can submit a discrepancy reason and the system updates the item's status to `Disputed`.  
+aged or lost on the delivery route. 
+**Acceptance scenarios:** see ### US-12.1 under Gherkin AC.
 
 ### US-12.2: Resolve Disputed Deliveries 
 
@@ -22,10 +23,10 @@
 **Acceptance scenarios:** see ### US-12.2 under Gherkin AC 
 
 ## Functional Requirements
-* The system must allow drivers to flag individual items within a `StoreOrder` as Missing, Damaged, or Overage. 
+* The system must allow drivers to flag individual items within a `CustomerOrder` as Missing, Damaged, or Overage. 
 * The system must require the driver to input the actual `qty_delivered` if it differs from the delivery receipt. 
 * The system must automatically change the order status to `Disputed` if any discrepancy is logged
-* The system must provides managers a dashboard to review, approve, and reject discrepancy claims. 
+* The system must provide managers a dashboard to review, approve, and reject discrepancy claims. 
 
 ## Assumptions 
 * Drivers have network connection at the Delivery site 
@@ -34,7 +35,7 @@
 ## Edge Cases 
 
 * **Complete Rejection:** The store refuses the entire order due to severe damage.
-* **Driver Input Error:** The driver accidentally logs a discrepancy on the wront item, 
+* **Driver Input Error:** The driver accidentally logs a discrepancy on the wrong item, 
 * **Overage:** The driver delivers 5 cases but the digital receipt only listed 4
 
 ## Success Criteria 
@@ -45,10 +46,10 @@
 
 
 ## Key Entities 
-* Driver / Manager 
-* StoreOrder
-* OrderItem
-* DiscrepancyLog
+* **Driver / Manager** 
+* **CustomerOrder**
+* **CustomerOrderItem**
+* **DiscrepancyLog**
 
 ## Initial Data Model 
 
@@ -58,22 +59,23 @@
 | Field Name | Data Type | Constraints | Description | 
 |---|---|---|---|
 | `log_id` | Integer | PK, Not Null | Unique identifier for the mismatch record |
-| `order_id` | Integer | FK, Not Null | Reference to the disputed StoreOrder | 
+| `order_id` | Integer | FK, Not Null | Reference to the disputed CustomerOrder| 
 | `item_id` | Integer | FK, Not Null | Reference to the specific item | 
 | `driver_id` | Integer | FK, Not Null | The driver who reported the issue | 
 | `qty_expected` | Integer | Not Null | What the digital records say |
 | `qty_delivered` | Integer | Not Null | What was physically handed over | 
 | `reason_code` | String | Not Null | ENUM: Missing, Damaged, Overage | 
 | `status` | String | Not Null | ENUM: Pending, Resolved, Rejected | 
+| `created_at` | DateTime | Not Null | Exact date and time the discrepancy was logged |
 
 ## Gherkin AC 
 
 ### US-12.1 
 **Scenario: Driver reports damaged goods** 
-**Given** Given the driver is completing an active delivery. 
+**Given** the driver is completing an active delivery. 
 **When** the driver inputs that 2 cases of an item are damaged 
 **Then** the system creates a `DiscrepancyLog` with the status `Pending`
-**And** the overarching `StoreOrder` status changes to `Disputed`
+**And** the overarching `CustomerOrder` status changes to `Disputed`
 
 ### US-12.2 
 **Scenario: Manager approves the discrepancy** 
@@ -89,9 +91,9 @@
 |---|---|
 |**Read scope**| Drivers only see discrepancies where `driver_id = req.user.id`. Managers see all.|
 | **Write scope** | Drivers can only create. Only Managers can update `status` to `Resolved`. | 
-| **Create Scope** | New logs auatomatically tied to the authenticated driver's ID. | 
+| **Create Scope** | New logs automatically tied to the authenticated driver's ID. | 
 | **Cross-user access** | Driver accessing another driver's log -> `404`. Driver attempting to resolve -> `403`.| 
-| **UI scope** | Manager dashboard shows all `Pending` logs. Driver screen shows their active dlivery. | 
+| **UI scope** | Manager dashboard shows all `Pending` logs. Driver screen shows their active delivery. | 
 | **Implementation** | Role-based access control (RBAC) enforced at the route level.| 
 
 ## API Requirements 
@@ -116,7 +118,7 @@
 
 ### [View: Log Discrepancy Dialog] - route name `delivery-mismatch`
 * Heading/purpose: Report Delivery Issue 
-* Primary action: **Submit Report** (`oc_cta`)
+* Primary action: **Submit Report** (`oc-cta`)
 * Fields: Reason Dropdown (Missing, Damaged, Overage), Actual Qty Input. 
 * Loading/error: `<v-alert type="error">` for missing reason codes. 
 
@@ -131,25 +133,25 @@
 | Story | Scenario | Test file | Test name | 
 |-------|----------|-----------|-----------|
 | US-12.1 | Driver reports damaged goods | `backend/tests/discrepancy.test.js` | `Driver submits new mismatch log` | 
-| US-12.2 | manager approves the discrepancy | `backend/tests/discrepancy.test.js` | `Manager resolves pending mismatch` |
+| US-12.2 | Manager approves the discrepancy | `backend/tests/discrepancy.test.js` | `Manager resolves pending mismatch` |
 
 
 ## Agent Implementation request 
 
 ```text
-Implement Featuere 12 from @feature-12-delivery-mismatches.md on branch `feature/12-delivery-mismatches`.
+Implement Feature 12 from @features/feature-12-delivery-mismatches.md on branch `feature/12-delivery-mismatches`.
 
-Follow Layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests). Map every Gherkin scenario in the Test Coverage Map; run `npm test` to verify the resolved state updates tbe master inventory.
+Follow Layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests). Map every Gherkin scenario in the Test Coverage Map; run `npm test` to verify the resolved state updates the master inventory.
 ```
 
 ## Definition of Done 
 
 * [ ] Backend and frontend implemented per this spec 
 * [ ] Success Criteria met 
-* [] All mapped tests pass (`npm test`)
-* [] `features/reference/data-model.md` updated (if schema changed)
-* [] `features/reference/api.md` updated (if API changed)
-* [] `features/ reference/behavior.md` updated (if product rules changed)
+* [ ] All mapped tests pass (`npm test`)
+* [ ] `features/reference/data-model.md` updated (if schema changed)
+* [ ] `features/reference/api.md` updated (if API changed)
+* [ ] `features/reference/behavior.md` updated (if product rules changed)
 
 ## Out of Scope 
 * Automatic financial invoicing or refunds to the store (handled by accounting).

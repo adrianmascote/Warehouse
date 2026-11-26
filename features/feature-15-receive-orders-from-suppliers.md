@@ -4,7 +4,7 @@
 
 ### US-15.1: Check In Delivery 
 **As a** worker 
-**i want to** log the items that arrive from a supplier 
+**I want to** log the items that arrive from a supplier 
 **So that** the system knows the delivery has physically entered the building 
 
 **Priority:** P1 
@@ -16,18 +16,18 @@
 **So that** we don't pay for inventory we never received. 
 
 **Priority:** P2
-**Independent test:** Verify the system compares the received quantitiy with the expected quantity and flags the order if the received amount was less than the expected amount. 
+**Independent test:** Verify the system compares the received quantity with the expected quantity and flags the order if the received amount was less than the expected amount. 
 
 ## Functional Requirements 
 
 * The system must allow a worker to search for an active `SupplierOrder` (status `Sent`, `Confirmed`, or `Delayed`) by its `order_id` when a truck arrives. 
-* The system must require the worker to input the actual`qty_received` for each item on the purchase order 
-* The system must automaticaly evalutate the amounts. If all items match the order, status updates to `Received` if any item is short, status updates to `Partially Received`. 
+* The system must require the worker to input the actual `qty_received` for each item on the purchase order 
+* The system must automatically evalutate the amounts. If all items match the order, status updates to `Received`. If any item is short, status updates to `Partially Received`. 
 * The system must record the `worker_id` of the employee checking in the delivery and the time of the check-in. 
 
 ## Assumptions 
 
-* The `SupplierOrder` was successfully created and exists in the daatabse from Feature 14. 
+* The `SupplierOrder` was successfully created and exists in the databse from Feature 14. 
 * The worker checking in the items has physical access to a scanner or terminal when on the receiving dock. 
 
 ## Edge Cases 
@@ -38,7 +38,7 @@
 ## Success Criteria 
 * A `ReceivingLog` is saved to the database 
 * The `SupplierOrder` status transitions as expected based on the business rules for partial receipts. 
-* The original request amounts are never overwritten. Actual received quanitities are stored separately for comparison. 
+* The original request amounts are never overwritten. Actual received quantities are stored separately for comparison. 
 
 ## Key Entities 
 * Worker / Manager 
@@ -59,7 +59,7 @@
 | `receive_date` | DateTime | Not Null | The exact date and time the delivery was checked in |  
 | `has_missing_items` | Boolean | Not Null | True if the received amount is less than the ordered amount |
 
-## ReceivingLogItem
+### ReceivingLogItem
 
 | Field Name | Data Type | Constraints | Description | 
 |---|---|---|---|
@@ -72,7 +72,7 @@
 
 ## Gherkin AC 
 
- ### US-15.1 
+### US-15.1 
 **Scenario: Worker receives a full delivery** 
 **Given** a worker is logged into the receiving screen 
 **When** the worker enters the order ID and confirms all expected item amounts match the physical delivery 
@@ -92,11 +92,11 @@
 |---|---|
 |**Read scope**| Any warehouse worker can look up active purchase orders to receive them. | 
 | **Write scope** | Any authorized floor worker can create a `ReceivingLog`.| 
-|**Update scope** | Role-based access control (RBAC) 
+|**Update scope** | Only Managers can edit or void a submitted ReceivingLog(RBAC enforced). |
 
 ## API Requirements 
 
-| Method | Endpoiont | Auth | Purpose | 
+| Method | Endpoint | Auth | Purpose | 
 |---|---|---|---|
 |  `GET`| `/api/supplier-orders/{order_id}`| Yes | Fetches the expected items for the worker to count against | 
 | `POST` | `/api/receiving-logs` | Yes | Submits the actual verified amounts | 
@@ -125,9 +125,9 @@
 
 ### [View: Receiving Dock Check-In] - route name `receiving-check-in`
 * Heading / purpose: Receive Supplier Delivery 
-* Primary action: **Log Delivery** `oc-cta`
+* Primary action: **Log Delivery** (`oc-cta`)
 * Fields: PO Search Bar, Expected vs. Actual Quantity Data Grid 
-* **Visual indicator** A red `<v-badge>` or warning icon next to any row where any actual quantity does not match the expected quantity. 
+* **Visual indicator:** A red `<v-badge>` or warning icon next to any row where any actual quantity does not match the expected quantity. 
 
 ## Definition of Done 
 
@@ -140,7 +140,7 @@
 
 ## Out of Scope 
 
-* Physical put-away of the received items onto the warehouse shelves 
+* Physical put-away of the received items onto the warehouse shelves (handled in Feature 16)
 * Authorizing payments to the supplier (handled by accounting). 
 
 ## Test Coverage Map 
@@ -154,7 +154,7 @@
 ```text 
 Implement Feature 15 from @features/feature-15-receive-orders-from-suppliers.md on branch `feature/15-receive-orders`. 
 
-Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend tests).
+Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests).
 Map every Gherkin scenario in the Test Coverage Map; run `npm test` to verify the logic correctly transitions the PO status to `Partially Received` when a shortage occurs. 
 
 ```

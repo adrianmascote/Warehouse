@@ -17,7 +17,7 @@
 **So that** I can identify if a specific chunk of orders is getting delayed and investigate the cause. 
 
 **Priority:** P1
-**Indpendent test:** Verify the system can sort shipped orders by fulfillment speed and group them into percentage brackets. 
+**Independent test:** Verify the system can sort shipped orders by fulfillment speed and group them into percentage brackets. 
 **Acceptance scenarios:** see ### US-11.2 under Gherkin AC 
 
 ## Functional Requirements 
@@ -31,8 +31,8 @@
 * There is enough historical order data in the system to calculate accurate percentiles 
 
 ## Edge Cases 
-* **Canceled Orders:** Orders that were cancelled before shipping must be excluded from the math so they don't influence the averages 
-* **Same-Day Anomalies:** Orders where `order_date` and `shipped_date` are identical down to the second (likely a system error or manual override) should be flagged or exluded. 
+* **Cancelled Orders:** Orders that were cancelled before shipping must be excluded from the math so they don't influence the averages 
+* **Same-Day Anomalies:** Orders where `order_date` and `shipped_date` are identical down to the second (likely a system error or manual override) should be flagged or excluded. 
 
 ## Success Criteria 
 * The dashboard successfully renders the average fulfillment time and percentiles. 
@@ -44,11 +44,13 @@
 * CustomerOrder
 * BillOfLading 
 
+## Initial Data Model 
+
 ### CustomerOrder (Referenced)
 
 | Field Name | Data Type | Constraints | Description | 
 |---|---|---|
-| `order_id` | Integer | Primary key for the customer order | 
+| `order_id` | Integer | PK, Not Null | Primary key for the customer order | 
 | `order_date` | DateTime | Not Null | The date and time the order was created | 
 | `status` | String | Not Null | The current order status | 
 
@@ -57,7 +59,7 @@
 | Field Name | Data Type | Description | 
 |---|---|---|
 | `bol_id` | Integer | PK, Not Null | Primary key for the shipping record | 
-| `order_id'` | Integer | Foreign key referencing the associated CustomerOrder |
+| `order_id` | Integer | FK, Not Null | Foreign key referencing the associated CustomerOrder |
 | `shipped_date` | DateTime | Not Null | The date and time the order was shipped | 
 
 ## Gherkin AC 
@@ -72,7 +74,7 @@
 **Scenario: Manager views shipping brackets** 
 **Given** the speed report is generated
 **When** the manager selects "View Brackets" 
-**Then** the system should group the orders to show what eprcentage shipped in under 24, 48, and over 72 hours. 
+**Then** the system should group the orders to show what percentage shipped in under 24, 48, and over 72 hours. 
 
 
 ## Data Ownership & Isolation 
@@ -81,7 +83,7 @@
 | **Read scope** | Managers can view aggregated data for all completed orders. Standard workers cannot view this report. | 
 | **Write scope** | None (Reporting features are Read-Only). |
 | **Create scope** | None. | 
-| **Cross-user-access** | Standard worker attempting to view `403 Access Denied`. | 
+| **Cross-user-access** | Standard worker attempting to view `403 Forbidden`. | 
 | **UI scope** | Report menu is only visible to the authenticated Manager roles |
 | **Implementation** | Role-based access control (RBAC) enforced through shared helper in `app/authorization/`. | 
 
@@ -112,17 +114,17 @@
 Implement Feature 11 from @features/feature-11-shipping-percentiles.md on branch `feature/11-shipping-percentiles`. 
 
 Follow Layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests). Map every Gherkin scenario in the Test Coverage Map; run `npm test` before finishing. 
-Ensure the SQL databases exclude canceled orders from the averages. 
+Ensure the SQL queries exclude canceled orders from the averages. 
 ```
 
 ## Definition of Done 
 * [ ] Backend and frontend implemented per this spec 
 * [ ] Success Criteria met 
-* [ ] All mapped test pass (`npm test`)
+* [ ] All mapped tests pass (`npm test`)
 * [ ] Test Coverage Map complete 
 * [ ] `features/reference/api.md` updated (if API changed)
 
 ## Out of Scope 
 
-* Real-time estimates for future unshipped orers 
+* Real-time estimates for future unshipped orders 
 * Driver specific delivery speed profiles (handled in a separate report)

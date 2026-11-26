@@ -13,7 +13,7 @@
 
 ### US-9.2: View Low Stock Items 
 **As a** warehouse manager 
-**I want to** view a report of items that have fallen bellow their minimum stock levels. 
+**I want to** view a report of items that have fallen below their minimum stock levels. 
 **So that** I can reorder products before they completely run out. 
 
 **Priority:** P1 
@@ -26,7 +26,7 @@
 **So that** I can send the data to the finance department to create supplier orders. 
 
 **Priority:** P2 
-**Independent test:** Verify the manager can download the generated report as PDF file. 
+**Independent test:** Verify the manager can download the generated report as a CSV file
 **Acceptance scenarios:** see ### US-9.3 under Gherkin AC 
 
 ## Functional Requirements 
@@ -62,10 +62,10 @@
 | Field Name | Data Type | Constraints | Description | 
 |---|---|---|---|
 | `inv_id` | Integer | PK, Not Null | Primary key for the inventory record | 
-| `item_id` | Integer | PK, Not Null | Foreign key referencing the specific item | 
+| `item_id` | Integer | FK, Not Null | Foreign key referencing the specific item | 
 | `zone_id` | Integer | FK, Not Null | Foreign key referencing the specific StorageZone | 
 | `current_inv_qty` | Integer | Not Null | The current quantity of the item in stock |
-| `min_level` | Integer | The minimum required stock level before reordering | 
+| `min_level` | Integer | Nullable | The minimum required stock level before reordering | 
 
 
 ### Item (Referenced)
@@ -76,28 +76,54 @@
 | `sku` | String | Not Null |  The SKU identifier for the item | 
 | `description` | String | Not Null | The description of the item |
 
-### StoragerZone (Referenced)
+### StoragerZone (Referenced from Feature 8)
 
 | Field Name | Data Type | Constraints | Description | 
 |---|---|---|---|
 | `zone_id` | Integer | PK, Not Null | Primary key for the storage zone | 
-| `bin_location` | String | Not Null | The physical aisle/bin location string | 
+| `aisle` | String | Not Null | Aisle identifier | 
+| `slot` | String | Not Null | Slot identifier | 
+| `bin` | String | Not Null | Bin identifier |
+
+
+## Gherkin AC 
+
+### US-9.1 
+**Scenario:** Manager runs the Out-of-Stock report 
+**Given** the manager is logged into the reporting screen
+**When** the manager clicks "Generate Out-of-Stock Report" 
+**Then** the system should display a list of all items with an inventory count of 0.
+
+### US-9.2 
+**Scenario:** Manager runs the Low Stock report 
+**Given** the manager is on the reporting screen 
+**When** the manager clicks "Generate Low Stock Report" 
+**Then** the system should display all items where the inventory count is at or below the minimum threshold. 
+
+### US-9.3 
+**Scenario:** Manager exports the inventory report 
+**Given** an inventory report is displayed on the screen 
+**When** the manager clicks "Export as Spreadsheet" 
+**Then** the system should download a CSV file containing the data of the active report. 
 
 
 ## Data Ownership & Isolation 
 | Rule | Requirement | 
 |---|---|
-| **Read scope** | Managers can view inventory added data across all zones and items.  | 
+| **Read scope** | Managers can view inventory data across all zones and items. | 
 | **Write scope** | None (Reporting features are Read-Only). |
 | **Create scope** | None. | 
-| **Cross-user-access** | Role-based access control (RBAC) enforced via shared helper `app/authorization/`. |
+| **Cross-user-access** | Standard worker attempting to view -> `403 Forbidden`. |
+| **Implementation** | Role-based access control (RBAC) enforced via shared helper `app/authorization/`. |
 
 ## API Requirements 
 
 | Method | Endpoint | Auth | Purpose | 
 |---|---|---|---|
-| `GET` | `/api/reports/inventory/out-of-stock` | Yes (Manager) | Fetches items where quantity <= min_level |
-|`GET` | `/api/reports/inventory/export` | Yes (Manager) | Returns the queried report data formatted as a downloadable CSV | 
+| `GET` | `/api/reports/inventory/out-of-stock` | Yes (Manager) | Fetches items where `quantity <= 0`  |
+|`GET` | `/api/reports/inventory/low-stock` | Yes (Manager) | Fetches items where `current_inv_qty <= min_level` (excluding `min_level <= 0` or `Null`) |
+| `GET` | `/api/reports/inventory/export` | Yes (Manager) | Returns the queried report data formatted as a downloadable CSV |
+
 
 ## Screen Requirements 
 
@@ -106,21 +132,21 @@
 * Primary actions: **View Out of Stock** (`oc-cta`), **View Low Stock** (`oc-cta`)
 * Secondary action: **Export as Spreadsheet** 
 * Fields/Displays: Data table featuring columns for SKU, Description, Current Qty, Min Level, and Bin Location. 
-* **Empty state:** "All items are currently adequately shocked." 
+* **Empty state:** "All items are currently adequately stocked." 
 * Loading: Data table skeleton loader. 
 
 ## Test Coverage Map 
 
 | Story | Scenario | Test file | Test name | 
 |---|---|---|---|
-| US-9.1 | Manager runs the Out-of-Stock report | `backend/tests/inventory-report.test.js` | `System returns items at or below minimum threshold` | 
+| US-9.1 | Manager runs the Out-of-Stock report | `backend/tests/inventory-report.test.js` | `System returns items with zero or negative inventory` | 
 | US-9.2 | Manager runs the Low Stock report | `backend/tests/inventory-report.test.js` | `System returns items at or below minimum threshold` | 
 | US-9.3 | Manager exports the inventory report | `backend/tests/inventory-report.test.js` | `System formats active report data as CSV download` | 
 
 ## Agent Implementation request 
 
 ```text 
-Implement Feature 9 from @features/feature-9-low-inventory.md on branch `feature/9-low-inventory`.
+Implement Feature 9 from @features/feature-9-outofstock-report.md on branch `feature/9-low-inventory`.
 
 Follow layer order in @features/framework.md (models -> routes -> backend tests -> frontend -> frontend tests).
 Map every Gherkin scenario in the Test Coverage Map; run `npm test` before finishing.
@@ -139,24 +165,5 @@ Ensure the CSV export endpoint dynamically handles whichever report (OOS or Low 
 * Forecasting future low stock events based on sales patterns. 
 
 
-## Gherkin AC 
-
-### US-9.1 
-**Scenario:** Manager runs the Out-of-Stock report 
-**Given** the manager is logged into the reporting screen
-**When** the manager clicks "Generate Out-of-Stock Report" 
-**Then** the system should display a list of all items with an inventory count of 0.
-
-### US-9.2 
-**Scenario:** Manager runs the Low Stock report 
-**Given** the manager is on the reporting screen 
-**When** the manager clicks "Generate Low Stock Report" 
-**Then** the system should display all item where the inventory count is at or bellow the minimum threshold. 
-
-### US-9.3 
-**Scenario:** Manager exports the inventory report 
-**Given** an inventory report is displayed on the screen 
-**When** the manager clicks "Export as Spreadsheet" 
-**Then** the system should download a CSV file containing the data of the active report. 
 
 
